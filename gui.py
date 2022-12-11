@@ -84,8 +84,8 @@ def append_interaction_to_chat_log(question, answer, chat_log=None):
 
 # Ask username
 
-gui.theme('DarkTeal10')
-
+#gui.theme('DarkTeal10')
+gui.theme('Material1')
 
 username = USERNAME
 
@@ -121,7 +121,7 @@ layout = [  [gui.Text('Hello! Do you want to talk with Joey?')],
             [gui.Output(size=(50,10), key='-OUTPUT-')],
             [gui.Text('Joey is waiting for your message.', key="-STATUS-", font=("Arial, 18"))],
             [gui.In(key='-IN-', do_not_clear=False)],
-            [gui.Button('Speak', bind_return_key=True), 
+            [gui.Button('Speak', bind_return_key=True, use_ttk_buttons=True), 
              gui.Button('Remember'), 
              gui.Button('Clear'), 
              gui.Button('Exit'),
