@@ -12,7 +12,7 @@ WIP
 
     git clone https://github.com//thecookingsenpai/MemorabilAI
     cd MemorabilAI
-    pip3 install -r requirements.txt
+    pip3 install -r requirements.pip
 
 You can run the script by executing:
 
