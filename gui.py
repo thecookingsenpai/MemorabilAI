@@ -6,9 +6,13 @@ import json
 import openai
 from sys import exit 
 import PySimpleGUI as gui
+
+# NOTE Ensure that the current directory is the one where the script is located
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 os.system("find . -name '*' -size 0 -print0 | xargs -0 rm")
 print(os.getcwd())
+
+# NOTE Load configuration
 try:
     configuration = {}
     with open("memo.config.openai.config", "r") as config:
