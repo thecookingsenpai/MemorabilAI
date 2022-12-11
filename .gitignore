@@ -12,3 +12,5 @@ icons/
 .vscode/
 
 .DS_Store
+
+memo.config.openai.config
