@@ -14,3 +14,7 @@ icons/
 .DS_Store
 
 memo.config.openai.config
+
+NeoX/20B_checkpoints/
+
+memory.json

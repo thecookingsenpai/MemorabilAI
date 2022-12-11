@@ -60,7 +60,7 @@ Joey: Hello there!
 print("\n\n >> Starting Joey with the following chat log:\n\n" + start_chat_log )
 print("\n ======================================== \n")
 
-def ask(question, chat_log=None):
+def ask(question, engineChosen="text-davinci-003", chat_log=None):
     if chat_log is None or len(chat_log) == 0:
         chat_log = start_chat_log
         s_chat_log = "Welcome to Joey\n"
@@ -68,7 +68,7 @@ def ask(question, chat_log=None):
         s_chat_log = chat_log
     prompt = f'{s_chat_log}\nHuman:{question}\nJoey:'
     response = completion.create(
-        prompt=prompt, engine="text-davinci-003", stop=['\nHuman'], temperature=0.8,
+        prompt=prompt, engine=engineChosen, stop=['\nHuman'], temperature=0.8,
         top_p=1, frequency_penalty=0.4, presence_penalty=0.8, best_of=1,
         max_tokens=75)
     answer = response.choices[0].text.strip()
@@ -117,6 +117,9 @@ chat_log_file = username + "_" + rstring + "_" + str(time.time()) + ".txt"
 # Main window
 layout = [  [gui.Text('Hello! Do you want to talk with Joey?')],
             [gui.Image(filename='Joey.png', size=(256, 256))],
+            [gui.Text('You can choose different engines powering Joey,\nfrom the most powerful to the less powerful.')],
+            [gui.Button('How to choose')],
+            [gui.Combo(['davinci-003', 'davinci-002', 'curie', 'babbage', 'ada'], default_value='davinci-003', key='-MODEL-')],
             [gui.Checkbox('Automatically save chat log', default=True, key='-AUTO-')],
             [gui.Output(size=(50,10), key='-OUTPUT-')],
             [gui.Text('Joey is waiting for your message.', key="-STATUS-", font=("Arial, 18"))],
@@ -142,6 +145,7 @@ while True:             # Event Loop
             print("Joey: Bye bye")
             window.close()  
             exit(0)
+            
         if event == 'Clear':
             window['-OUTPUT-'].update('')
         
@@ -159,30 +163,66 @@ while True:             # Event Loop
             continue
         
         if event == "Help":
+            gui.Popup("""You can press "Remember" button anytime you want the AI to memorize the last 
+                      exchange (aka the last interaction composed of your message and the AI answer). 
+                      You can also edit manually memory.json file to:
+                      
+                      - Specify some starting parameters in the "starting" section
+                      - Edit, remove or add memories in the "memory" section.
+                      """)
+            continue
+        
+        if event == "How to choose":
+            gui.Popup("""Different engines (aka models) offer different performances and costs.
+                      In general, the more powerful the engine, the more expensive it is.
+                      The models are ordered from the most powerful to the least powerful.
+                      You can discover more about the models here: https://openai.com/api/pricing/.
+                      As a tldr, at the time of writing, the pricing table goes like:
+                      - davinci-003: 0.0200$ per token
+                      - davinci-002: 0.0200$ per token
+                      - curie: 0.0020$ per token
+                      - babbage: 0.0005$ per token
+                      - ada: 0.0004$ per token
+                      """)
             continue
 
-        userInput = values.get("-IN-")
-        window.Element("-STATUS-").update("Joey is answering...")
-        print(username + ": " + userInput)
-        # NOTE Saving last human interaction
-        last_human_interaction =  "Human: " + userInput
-        try:
-            answer = ask(userInput.lower(), chat_log)
-        except Exception as u:
+        if event == "Speak":
+            # NOTE Getting model choice
+            modelChosen = values['-MODEL-']
+            engineChosen = 'text-davinci-003'
+            if modelChosen == "davinci-003":
+                engineChosen = "text-davinci-003"
+            elif modelChosen == "davinci-002":
+                engineChosen = "text-davinci-002"
+            elif modelChosen == "curie":
+                engineChosen = "text-curie-001"
+            elif modelChosen == "babbage":
+                engineChosen == 'text-babbage-001'
+            elif modelChosen == "ada":
+                engineChosen == 'text-ada-001'
+            # NOTE Getting the user input
+            userInput = values.get("-IN-")
+            window.Element("-STATUS-").update("Joey is answering...")
+            print(username + ": " + userInput)
+            # NOTE Saving last human interaction
+            last_human_interaction =  "Human: " + userInput
             try:
-                # NOTE Handling too long chat log
-                chat_log = chat_log[:(len(chat_log)/3)]
-                answer = ask(userInput.lower(), chat_log)
-            except Exception as e:
-                raise Exception ("DANG! " + str(e) + "\n" + str(u))
-        window.Element("-STATUS-").Update("Joey waiting for your text.")
-        print("\nJoey: " + answer + "\n")
-        # NOTE Saving last joey interaction
-        last_joey_interaction = "Joey: " + answer
-        chat_log = append_interaction_to_chat_log(userInput, answer, chat_log)
-        if values['-AUTO-']:
-            with open(chat_log_file, "w+") as f:
-                f.write(chat_log)
+                answer = ask(userInput.lower(), engineChosen, chat_log)
+            except Exception as u:
+                try:
+                    # NOTE Handling too long chat log
+                    chat_log = chat_log[:(len(chat_log)/3)]
+                    answer = ask(userInput.lower(), engineChosen, chat_log)
+                except Exception as e:
+                    raise Exception ("DANG! " + str(e) + "\n" + str(u))
+            window.Element("-STATUS-").Update("Joey waiting for your text.")
+            print("\nJoey: " + answer + "\n")
+            # NOTE Saving last joey interaction
+            last_joey_interaction = "Joey: " + answer
+            chat_log = append_interaction_to_chat_log(userInput, answer, chat_log)
+            if values['-AUTO-']:
+                with open(chat_log_file, "w+") as f:
+                    f.write(chat_log)
     except Exception as e:
         gui.PopupError("Joey went bad. It reported: \n" + str(e))
         try:
