@@ -1,0 +1,14 @@
+
+best/
+
+genesis/
+
+*.txt
+
+testing.py
+
+icons/
+
+.vscode/
+
+.DS_Store
