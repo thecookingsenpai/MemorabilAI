@@ -1,5 +1,8 @@
 # MemorabilAI
 
+![image](https://user-images.githubusercontent.com/67682496/210121965-e069fac9-2a56-4c05-877f-88a9a4193920.png)
+
+
 ## A GPT3 based AI without constraints
 
 ## ..And with memory
